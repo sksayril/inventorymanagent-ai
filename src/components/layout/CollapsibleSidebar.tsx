@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useSidebar } from "@/context/SidebarContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarLinkProps {
   to: string;
@@ -64,8 +65,15 @@ const SidebarLink = ({
 
 const CollapsibleSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const { isCollapsed, setIsCollapsed } = useSidebar();
+  const { logout, user } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const navigationLinks = [
     { to: "/", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
@@ -91,6 +99,11 @@ const CollapsibleSidebar = () => {
           <div>
             <h1 className="text-xl font-bold text-white">Inventory System</h1>
             <p className="text-sky-100 text-xs">GST Billing Solution</p>
+            {user && (
+              <p className="text-sky-100 text-xs mt-1">
+                Welcome, {user.userName}
+              </p>
+            )}
           </div>
         )}
         <button
@@ -123,6 +136,7 @@ const CollapsibleSidebar = () => {
             isCollapsed={isCollapsed}
           />
           <button
+            onClick={handleLogout}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-sky-600 rounded-md transition-colors",
               isCollapsed && "justify-center",
